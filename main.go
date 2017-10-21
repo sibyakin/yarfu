@@ -11,22 +11,24 @@ func main() {
 	mux.LoadHTMLGlob("templates/*.html")
 	mux.Static("/static", "./static")
 
+	// In future we can easily add new versions
+	// of our API and It will be painless (hopefully)
 	apiv1 := mux.Group("/api/v1")
-	apiv1.GET("/images", imageslist)
-	apiv1.GET("/images/:id", imagesdetail)
-	apiv1.PUT("/images", imagesadd)
+	apiv1.GET("/images", imagesListV1)
+	apiv1.GET("/images/:id", imageDetailV1)
+	apiv1.PUT("/images", imageAddV1)
 
 	log.Fatalln(mux.Run())
 }
 
-func imageslist(ctx *gin.Context) {
+func imagesListV1(ctx *gin.Context) {
 	ctx.JSON(200, gin.H{})
 }
 
-func imagesdetail(ctx *gin.Context) {
+func imageDetailV1(ctx *gin.Context) {
 	ctx.JSON(200, gin.H{})
 }
 
-func imagesadd(ctx *gin.Context) {
+func imageAddV1(ctx *gin.Context) {
 	ctx.JSON(200, gin.H{})
 }
