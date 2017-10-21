@@ -10,6 +10,6 @@ func main() {
 	mux.Run()
 }
 
-func imageslist() {
-
+func imageslist(ctx *gin.Context) {
+	ctx.JSON(200, "Hello world!")
 }
