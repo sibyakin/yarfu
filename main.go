@@ -14,21 +14,31 @@ func main() {
 	// In future we can easily add new versions
 	// of our API and It will be painless (hopefully)
 	apiv1 := mux.Group("/api/v1")
-	apiv1.GET("/images", imagesListV1)
-	apiv1.GET("/images/:id", imageDetailV1)
-	apiv1.PUT("/images", imageAddV1)
+	apiv1.GET("/images", imgListV1)
+	apiv1.GET("/images/:id", imgDetailV1)
+	apiv1.PUT("/images", imgAddV1)
+	apiv1.PUT("/images/json", imgAddJSONV1)
+	apiv1.PUT("/images/url", imgAddURLV1)
 
 	log.Fatalln(mux.Run())
 }
 
-func imagesListV1(ctx *gin.Context) {
+func imgListV1(ctx *gin.Context) {
+	ctx.HTML(200, "list.html", gin.H{})
+}
+
+func imgDetailV1(ctx *gin.Context) {
+	ctx.HTML(200, "detail.html", gin.H{})
+}
+
+func imgAddV1(ctx *gin.Context) {
 	ctx.JSON(200, gin.H{})
 }
 
-func imageDetailV1(ctx *gin.Context) {
+func imgAddJSONV1(ctx *gin.Context) {
 	ctx.JSON(200, gin.H{})
 }
 
-func imageAddV1(ctx *gin.Context) {
+func imgAddURLV1(ctx *gin.Context) {
 	ctx.JSON(200, gin.H{})
 }
