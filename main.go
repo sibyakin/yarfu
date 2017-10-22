@@ -32,9 +32,8 @@ func main() {
 	// of our API and It will be painless (hopefully)
 	apiv1 := mux.Group("/api/v1")
 	apiv1.GET("/images", imgListV1)
-	apiv1.GET("/images/url", imgAddURLV1)
-	//apiv1.GET("/images/:id", imgDetailV1)
 	apiv1.POST("/images", imgAddV1)
+	apiv1.GET("/images/url", imgAddURLV1)
 	apiv1.POST("/images/json", imgAddJSONV1)
 
 	log.Fatalln(mux.Run())
@@ -43,10 +42,6 @@ func main() {
 func imgListV1(ctx *gin.Context) {
 	ctx.HTML(200, "list.html", gin.H{})
 }
-
-//func imgDetailV1(ctx *gin.Context) {
-//	ctx.HTML(200, "detail.html", gin.H{})
-//}
 
 func imgAddV1(ctx *gin.Context) {
 	form, _ := ctx.MultipartForm()
