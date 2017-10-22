@@ -9,7 +9,7 @@ import (
 func main() {
 	mux := gin.Default()
 	mux.LoadHTMLGlob("templates/*.html")
-	mux.Static("/static", "./static")
+	mux.Static("/public", "./public")
 
 	// In future we can easily add new versions
 	// of our API and It will be painless (hopefully)
