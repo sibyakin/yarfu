@@ -4,10 +4,9 @@ import (
 	"encoding/base64"
 	"fmt"
 	"image"
-	_ "image/gif"
-	_ "image/jpeg"
-	_ "image/png"
+	"image/png"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -15,8 +14,7 @@ import (
 
 // String64 is a Gin request binding for json/base64 parsing
 type String64 struct {
-	Image64 string `json:"image64"`
-	//Image64 string `json:"image64" binding:"required"`
+	Image64 string `json:"image64" binding:"required"`
 }
 
 func main() {
@@ -65,18 +63,39 @@ func imgAddJSONV1(ctx *gin.Context) {
 		return
 	}
 	reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(json.Image64))
-	//result, typ, err := image.Decode(reader)
-	_, typ, err := image.Decode(reader)
+	// result of decoding: detected (automatically) type (png, jpeg and gif supported) and err
+	result, typ, err := image.Decode(reader)
 	if err != nil {
 		ctx.String(500, "Unable to decode base64 to image!\n")
 		return
 	}
-	//file, err := os.Create("./public/test" + typ)
-	//if err != nil {
-	//ctx.String(500, "Unable to save file on server!")
-	//return
-	//}
-	ctx.String(200, "Parsed type is "+typ+"\n")
+	file, err := os.Create("./public/test" + "." + typ)
+	if err != nil {
+		ctx.String(500, "Unable to save file on server!")
+		return
+	}
+	defer file.Close()
+	switch typ {
+	case "png":
+		err = png.Encode(file, result)
+		if err != nil {
+			ctx.String(500, "Unable to save file on server!")
+			return
+		}
+		//case "jpeg":
+		//	err = jpeg.Encode(file, result)
+		//	if err != nil {
+		//		ctx.String(500, "Unable to save file on server!")
+		//		return
+		//	}
+		//case "gif":
+		//	err = gif.Encode(file, result)
+		//	if err != nil {
+		//		ctx.String(500, "Unable to save file on server!")
+		//		return
+		//	}
+	}
+	ctx.String(200, "Image saved successfylly\n")
 }
 
 func imgAddURLV1(ctx *gin.Context) {
