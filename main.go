@@ -3,6 +3,11 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
+	"image"
+	"image/color"
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
 	"io"
 	"log"
 	"net/http"
@@ -40,10 +45,12 @@ func main() {
 	log.Fatalln(mux.Run())
 }
 
-func createThumb(filename string) {
-	img, _ := imaging.Open(filename)
+func createThumb(_ string) {
+	img, _ := imaging.Open("./public/doge.png")
 	thumb := imaging.Thumbnail(img, 100, 100, imaging.Box)
-	imaging.Save(thumb, "./public/thumb_"+filename)
+	result := imaging.New(100, 100, color.NRGBA{0, 0, 0, 0})
+	result = imaging.Paste(result, thumb, image.Pt(0, 0))
+	imaging.Save(result, "./public/thumb_doge.png")
 }
 
 func imgListV1(ctx *gin.Context) {
@@ -83,7 +90,7 @@ func imgAddJSONV1(ctx *gin.Context) {
 		return
 	}
 	createThumb(filename)
-	ctx.JSON(200, "Image saved successfully\n")
+	ctx.String(200, "Image saved successfully\n")
 }
 
 func imgAddURLV1(ctx *gin.Context) {
