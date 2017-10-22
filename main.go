@@ -14,6 +14,7 @@ import (
 
 // String64 is a Gin request binding for json/base64 parsing
 type String64 struct {
+	Name    string `json:"name" binding:"required"`
 	Image64 string `json:"image64" binding:"required"`
 }
 
