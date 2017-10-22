@@ -1,11 +1,23 @@
 package main
 
 import (
+	"encoding/base64"
 	"fmt"
+	"image"
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
 	"log"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
+
+// String64 is a Gin request binding for json/base64 parsing
+type String64 struct {
+	Image64 string `json:"image64"`
+	//Image64 string `json:"image64" binding:"required"`
+}
 
 func main() {
 	mux := gin.Default()
@@ -34,7 +46,7 @@ func imgDetailV1(ctx *gin.Context) {
 
 func imgAddV1(ctx *gin.Context) {
 	form, _ := ctx.MultipartForm()
-	files := form.File["file"]
+	files := form.File["files[]"]
 	for _, file := range files {
 		err := ctx.SaveUploadedFile(file, "./public/"+file.Filename)
 		if err != nil {
@@ -45,7 +57,26 @@ func imgAddV1(ctx *gin.Context) {
 }
 
 func imgAddJSONV1(ctx *gin.Context) {
-	ctx.JSON(200, gin.H{})
+	var json String64
+	err := ctx.BindJSON(&json)
+	if err != nil {
+		fmt.Println(err)
+		ctx.String(500, "Unable to parse request body!\n")
+		return
+	}
+	reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(json.Image64))
+	//result, typ, err := image.Decode(reader)
+	_, typ, err := image.Decode(reader)
+	if err != nil {
+		ctx.String(500, "Unable to decode base64 to image!\n")
+		return
+	}
+	//file, err := os.Create("./public/test" + typ)
+	//if err != nil {
+	//ctx.String(500, "Unable to save file on server!")
+	//return
+	//}
+	ctx.String(200, "Parsed type is "+typ+"\n")
 }
 
 func imgAddURLV1(ctx *gin.Context) {
