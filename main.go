@@ -60,7 +60,7 @@ func imgAdd(ctx *gin.Context) {
 	for _, file := range files {
 		err := ctx.SaveUploadedFile(file, workdir+file.Filename)
 		if err != nil {
-			ctx.String(500, "Unable to save one or more files!")
+			ctx.String(500, "Unable to save one or more file(s)!")
 			return
 		}
 		createThumb(file.Filename)
