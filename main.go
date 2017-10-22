@@ -3,8 +3,7 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
-	"image"
-	"image/png"
+	"io"
 	"log"
 	"os"
 	"strings"
@@ -64,39 +63,18 @@ func imgAddJSONV1(ctx *gin.Context) {
 		return
 	}
 	reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(json.Image64))
-	// result of decoding: detected (automatically) type (png, jpeg and gif supported) and err
-	result, typ, err := image.Decode(reader)
+	file, err := os.Create("./public/" + json.Name)
 	if err != nil {
-		ctx.String(500, "Unable to decode base64 to image!\n")
-		return
-	}
-	file, err := os.Create("./public/test" + "." + typ)
-	if err != nil {
-		ctx.String(500, "Unable to save file on server!")
+		ctx.String(500, "Unable to save file on server!\n")
 		return
 	}
 	defer file.Close()
-	switch typ {
-	case "png":
-		err = png.Encode(file, result)
-		if err != nil {
-			ctx.String(500, "Unable to save file on server!")
-			return
-		}
-		//case "jpeg":
-		//	err = jpeg.Encode(file, result)
-		//	if err != nil {
-		//		ctx.String(500, "Unable to save file on server!")
-		//		return
-		//	}
-		//case "gif":
-		//	err = gif.Encode(file, result)
-		//	if err != nil {
-		//		ctx.String(500, "Unable to save file on server!")
-		//		return
-		//	}
+	_, err = io.Copy(file, reader)
+	if err != nil {
+		ctx.String(500, "Unable to save file on server!\n")
+		return
 	}
-	ctx.String(200, "Image saved successfylly\n")
+	ctx.String(200, "Image saved successfully\n")
 }
 
 func imgAddURLV1(ctx *gin.Context) {
