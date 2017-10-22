@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -16,9 +17,9 @@ func main() {
 	apiv1 := mux.Group("/api/v1")
 	apiv1.GET("/images", imgListV1)
 	apiv1.GET("/images/:id", imgDetailV1)
-	apiv1.PUT("/images", imgAddV1)
-	apiv1.PUT("/images/json", imgAddJSONV1)
-	apiv1.PUT("/images/url", imgAddURLV1)
+	apiv1.POST("/images", imgAddV1)
+	apiv1.POST("/images/json", imgAddJSONV1)
+	apiv1.POST("/images/url", imgAddURLV1)
 
 	log.Fatalln(mux.Run())
 }
@@ -32,7 +33,15 @@ func imgDetailV1(ctx *gin.Context) {
 }
 
 func imgAddV1(ctx *gin.Context) {
-	ctx.JSON(200, gin.H{})
+	form, _ := ctx.MultipartForm()
+	files := form.File["file"]
+	for _, file := range files {
+		err := ctx.SaveUploadedFile(file, "./public/"+file.Filename)
+		if err != nil {
+			ctx.String(500, "Internal Server Error")
+		}
+	}
+	ctx.String(200, fmt.Sprintf("%d file(s) uploaded successfully!\n", len(files)))
 }
 
 func imgAddJSONV1(ctx *gin.Context) {
