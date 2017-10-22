@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/disintegration/imaging"
 	"github.com/gin-gonic/gin"
 )
 
@@ -39,6 +40,12 @@ func main() {
 	log.Fatalln(mux.Run())
 }
 
+func createThumb(filename string) {
+	img, _ := imaging.Open(filename)
+	thumb := imaging.Thumbnail(img, 100, 100, imaging.Box)
+	imaging.Save(thumb, "./public/thumb_"+filename)
+}
+
 func imgListV1(ctx *gin.Context) {
 	ctx.HTML(200, "list.html", gin.H{})
 }
@@ -63,7 +70,8 @@ func imgAddJSONV1(ctx *gin.Context) {
 		return
 	}
 	reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(json.Image64))
-	file, err := os.Create("./public/" + json.Name)
+	filename := "./public/" + json.Name
+	file, err := os.Create(filename)
 	if err != nil {
 		ctx.String(500, "Unable to save file on server!\n")
 		return
@@ -74,6 +82,7 @@ func imgAddJSONV1(ctx *gin.Context) {
 		ctx.String(500, "Unable to save file on server!\n")
 		return
 	}
+	createThumb(filename)
 	ctx.JSON(200, "Image saved successfully\n")
 }
 
