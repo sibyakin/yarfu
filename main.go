@@ -45,12 +45,12 @@ func main() {
 	log.Fatalln(mux.Run())
 }
 
-func createThumb(_ string) {
-	img, _ := imaging.Open("./public/doge.png")
+func createThumb(filename string) {
+	img, _ := imaging.Open("./public/" + filename)
 	thumb := imaging.Thumbnail(img, 100, 100, imaging.Box)
 	result := imaging.New(100, 100, color.NRGBA{0, 0, 0, 0})
 	result = imaging.Paste(result, thumb, image.Pt(0, 0))
-	imaging.Save(result, "./public/thumb_doge.png")
+	imaging.Save(result, "./public/thumb_"+filename)
 }
 
 func imgListV1(ctx *gin.Context) {
@@ -77,8 +77,7 @@ func imgAddJSONV1(ctx *gin.Context) {
 		return
 	}
 	reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(json.Image64))
-	filename := "./public/" + json.Name
-	file, err := os.Create(filename)
+	file, err := os.Create("./public/" + json.Name)
 	if err != nil {
 		ctx.String(500, "Unable to save file on server!\n")
 		return
@@ -89,7 +88,7 @@ func imgAddJSONV1(ctx *gin.Context) {
 		ctx.String(500, "Unable to save file on server!\n")
 		return
 	}
-	createThumb(filename)
+	createThumb(json.Name)
 	ctx.String(200, "Image saved successfully\n")
 }
 
