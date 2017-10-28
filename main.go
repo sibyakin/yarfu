@@ -33,7 +33,6 @@ type URLForm struct {
 
 func main() {
 	mux := gin.Default()
-	mux.LoadHTMLGlob("templates/*.html")
 	mux.Static("/public", "./public")
 
 	// In future we can easily add new versions
