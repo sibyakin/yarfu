@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/base64"
 	"fmt"
 	"image"
@@ -12,7 +13,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"strings"
+	"time"
 
 	"github.com/disintegration/imaging"
 	"github.com/gin-gonic/gin"
@@ -42,7 +45,29 @@ func main() {
 	apiv1.GET("/images/url", imgAddURL)
 	apiv1.POST("/images/json", imgAddJSON)
 
-	log.Fatalln(mux.Run())
+	srv := &http.Server{
+		Addr:    ":8080",
+		Handler: mux,
+	}
+
+	gracefulStop := make(chan os.Signal)
+	signal.Notify(gracefulStop, os.Interrupt)
+
+	go func() {
+		if err := srv.ListenAndServe(); err != nil {
+			log.Printf("Server started: %s\n", err)
+		}
+	}()
+
+	// This part will be executed only after receiving SIGINT
+	<-gracefulStop
+	log.Printf("Shutting down the server...\n")
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatal("Server graceful shutdown error:", err)
+	}
+	log.Printf("Server exited")
 }
 
 func createThumb(filename string) {
