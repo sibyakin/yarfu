@@ -38,7 +38,7 @@ uploading by url example:
 curl -vvv -X GET "http://127.0.0.1:8080/api/v1/images/url?url=https://pythonprogramming.net/static/images/mainlogowhitethick.jpg"
 
 
-###### kickstart:
+### kickstart:
 
 docker build -t yarfu .
 
