@@ -6,6 +6,8 @@ rest api microservice that accepts image file uploads
 
 currently only jpeg, png and gif formats are supported
 
+go v1.8 required (becouse of context needed for graceful shutdown)
+
  - all uploaded images can be reached via /public/filename url
  - all valid uploaded images will have 100x100 thumb image via /public/thumb\_filename url
  - multiple files, multipart/form-data requests supported
@@ -34,3 +36,12 @@ curl -vvv -X POST -H "Content-Type: application/json" --data @doge.json http://1
 uploading by url example:
 
 curl -vvv -X GET "http://127.0.0.1:8080/api/v1/images/url?url=https://pythonprogramming.net/static/images/mainlogowhitethick.jpg"
+
+
+###### kickstart:
+
+docker build -t yarfu .
+
+docker run -p 8080:8080 --name yarfu --rm -e GIN_MODE=release yarfu
+
+docker kill -s INT yarfu #(graceful shutdown implemented via SIGINT signal)
